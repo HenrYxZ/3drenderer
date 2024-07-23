@@ -60,6 +60,12 @@ void draw_grid(void) {
 }
 
 
+void draw_pixel(int x, int y, uint32_t color) {
+	if (x < window_width && y < window_height)
+		color_buffer[(window_width * y) + x] = color;
+}
+
+
 void draw_rect(int x, int y, int w, int h, uint32_t color) {
 	// Check x and y are inside the 
 	if (x < 0)
