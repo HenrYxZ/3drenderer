@@ -15,7 +15,7 @@ vec3_t cube_points [N_POINTS];
 vec2_t projected_points[N_POINTS];
 
 bool is_running = false;
-
+int previous_frame_time = 0;
 
 void setup(void) {
 	color_buffer = (uint32_t*) malloc(sizeof(uint32_t) * window_width * window_height);
@@ -69,6 +69,16 @@ vec2_t project(vec3_t point) {
 }
 
 void update(void) {
+
+	int delta_time = SDL_GetTicks() - previous_frame_time;
+	int time_to_wait = FRAME_TARGET_TIME - delta_time;
+
+	if (time_to_wait > 0 && time_to_wait <= FRAME_TARGET_TIME) {
+		SDL_Delay(time_to_wait);
+	}
+
+	previous_frame_time = SDL_GetTicks();
+
 	// Cube animation
 	cube_rotation.x += 0.01;
 	cube_rotation.y += 0.01;
