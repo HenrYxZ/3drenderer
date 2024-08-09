@@ -2,11 +2,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <SDL.h>
+#include "array.h"
 #include "display.h"
 #include "mesh.h"
 #include "vector.h"
 
-triangle_t triangles_to_render[N_MESH_FACES];
+triangle_t* triangles_to_render = NULL;
 
 float fov_factor = 640;
 
@@ -67,6 +68,9 @@ void update(void) {
 
 	previous_frame_time = SDL_GetTicks();
 
+	// Initialize the array of projected triangles
+	triangles_to_render = NULL;
+
 	// Cube animation
 	cube_rotation.x += 0.01;
 	cube_rotation.y += 0.01;
@@ -102,7 +106,7 @@ void update(void) {
 		}
 		
 		// Save the projected triangle in the array of triangles to render
-		triangles_to_render[i] = projected_triangle;
+		array_push(triangles_to_render, projected_triangle);
 	}
 }
 
@@ -111,7 +115,8 @@ void render(void) {
 	
 	draw_grid();
 
-	for (int i = 0; i < N_MESH_FACES; i++) {
+	int num_triangles = array_length(triangles_to_render);
+	for (int i = 0; i < num_triangles; i++) {
 		triangle_t triangle = triangles_to_render[i];
 
 		draw_triangle(
@@ -124,6 +129,9 @@ void render(void) {
 			0xFF00F800
 		);
 	}
+
+	// Clear the array of triangles to render every frame loop
+	array_free(triangles_to_render);
 
 	render_color_buffer();
 	clear_color_buffer(0xFF000000);
