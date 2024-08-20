@@ -26,7 +26,7 @@ void setup(void) {
 		window_width,
 		window_height
 	);
-	load_cube_mesh_data();
+	load_obj_file('./assets/cube.obj');
 }
 
 void handle_input(void) {

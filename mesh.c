@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string>
 #include "array.h"
 #include "mesh.h"
 
@@ -47,5 +48,17 @@ void load_cube_mesh_data(void) {
 
     face_t cube_face = cube_faces[i];
     array_push(mesh.faces, cube_face);
+  }
+}
+
+void load_obj_file(char* filename) {
+  FILE* fp;
+  char line[256];
+  while (fgets(line, sizeof(line), fp)) {
+    if (line[0] == 'v') {
+      // add new vertex
+      // line += 1;
+      // strtok(line, ' ');
+    }
   }
 }
