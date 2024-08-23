@@ -26,7 +26,7 @@ void setup(void) {
 		window_width,
 		window_height
 	);
-	load_obj_file('./assets/cube.obj');
+	load_obj_file("./assets/f22.obj");
 }
 
 void handle_input(void) {
@@ -73,8 +73,8 @@ void update(void) {
 
 	// Cube animation
 	mesh.rotation.x += 0.01;
-	mesh.rotation.y += 0.01;
-	mesh.rotation.z += 0.01;
+	//mesh.rotation.y += 0.01;
+	//mesh.rotation.z += 0.01;
 
 	// Loop all triangle faces of our mesh
 	int num_faces = array_length(mesh.faces);

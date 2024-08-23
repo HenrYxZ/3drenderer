@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <string>
+#include <string.h>
 #include "array.h"
 #include "mesh.h"
 
@@ -53,12 +53,33 @@ void load_cube_mesh_data(void) {
 
 void load_obj_file(char* filename) {
   FILE* fp;
-  char line[256];
-  while (fgets(line, sizeof(line), fp)) {
-    if (line[0] == 'v') {
-      // add new vertex
-      // line += 1;
-      // strtok(line, ' ');
+  fopen_s(&fp, filename, "r");
+  char line[1024];
+  while (fgets(line, 1024, fp)) {
+    // Vertex position
+    if (strncmp(line, "v ", 2) == 0) {
+      vec3_t v;
+      sscanf_s(line, "v %f %f %f", &v.x, &v.y, &v.z);
+      array_push(mesh.vertices, v);
+    }
+
+    // Face indices
+    if (strncmp(line, "f ", 2) == 0) {
+      int vertex_indices[3];
+      int texture_indices[3];
+      int normal_indices[3];
+      sscanf_s(
+        line,
+        "f %d/%d/%d %d/%d/%d %d/%d/%d",
+        &vertex_indices[0], &texture_indices[0], &normal_indices[0],
+        &vertex_indices[1], &texture_indices[1], &normal_indices[1],
+        &vertex_indices[2], &texture_indices[2], &normal_indices[2]
+      );
+      face_t f = {
+        .a = vertex_indices[0], .b = vertex_indices[1], .c = vertex_indices[2]
+      };
+      array_push(mesh.faces, f);
     }
   }
+  fclose(fp);
 }
