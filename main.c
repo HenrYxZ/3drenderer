@@ -27,7 +27,7 @@ void setup(void) {
 		window_width,
 		window_height
 	);
-	load_obj_file("./assets/f22.obj");
+	load_obj_file("./assets/cube.obj");
 }
 
 void handle_input(void) {
@@ -157,7 +157,7 @@ void render(void) {
 	for (int i = 0; i < num_triangles; i++) {
 		triangle_t triangle = triangles_to_render[i];
 
-		// draw_triangle(
+		// draw fill triangle
 		draw_filled_triangle(
 			triangle.points[0].x,
 			triangle.points[0].y,
@@ -165,7 +165,18 @@ void render(void) {
 			triangle.points[1].y,
 			triangle.points[2].x,
 			triangle.points[2].y,
-			0xFF00F800
+			0xFFFFFFFF
+		);
+
+		// draw wireframe
+		draw_triangle(
+			triangle.points[0].x,
+			triangle.points[0].y,
+			triangle.points[1].x,
+			triangle.points[1].y,
+			triangle.points[2].x,
+			triangle.points[2].y,
+			0xFF000000
 		);
 	}
 
