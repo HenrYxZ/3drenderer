@@ -6,6 +6,7 @@
 #include "display.h"
 #include "mesh.h"
 #include "vector.h"
+#include "triangle.h"
 
 triangle_t* triangles_to_render = NULL;
 
@@ -156,7 +157,8 @@ void render(void) {
 	for (int i = 0; i < num_triangles; i++) {
 		triangle_t triangle = triangles_to_render[i];
 
-		draw_triangle(
+		// draw_triangle(
+		draw_filled_triangle(
 			triangle.points[0].x,
 			triangle.points[0].y,
 			triangle.points[1].x,
