@@ -33,6 +33,9 @@
     <ClCompile Include="triangle.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="matrix.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="display.h">
@@ -49,6 +52,9 @@
     </ClInclude>
     <ClInclude Include="array.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="matrix.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
