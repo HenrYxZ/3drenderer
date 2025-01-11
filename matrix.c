@@ -11,11 +11,20 @@ mat4_t mat4_identity(void) {
 	return m;
 }
 
-mat4_t mat4_create_scale(float sx, float sy, float sz) {
+mat4_t mat4_make_scale(float sx, float sy, float sz) {
 	mat4_t m = mat4_identity();
 	m.m[0][0] = sx;
 	m.m[1][1] = sy;
 	m.m[2][2] = sz;
+	return m;
+}
+
+mat4_t mat4_make_translation(float tx, float ty, float tz)
+{
+	mat4_t m = mat4_identity();
+	m.m[0][3] = tx;
+	m.m[1][3] = ty;
+	m.m[2][3] = tz;
 	return m;
 }
 
