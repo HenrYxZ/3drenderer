@@ -94,8 +94,8 @@ void update(void) {
 	mesh.rotation.y += 0.01;
 	mesh.rotation.z += 0.01;
 
-	// mesh.scale.x += 0.002;
-	// mesh.scale.y += 0.001;
+	mesh.scale.x += 0.002;
+	mesh.scale.y += 0.001;
 
 	mesh.translation.x += 0.01;
 	// Translate the vertices away from the camera
@@ -126,14 +126,19 @@ void update(void) {
 		for (int j = 0; j < 3; j++) {
 			vec4_t transformed_vertex = vec4_from_vec3(face_vertices[j]);
 
-			// Use a matrix to scale vertex
-			transformed_vertex = mat4_mul_vec4(scale_matrix, transformed_vertex);
+			mat4_t world_matrix = mat4_identity();
+			// Use a matrix to scale
+			world_matrix = mat4_mul_mat4(scale_matrix, world_matrix);
 			// Use matrix to rotate
-			transformed_vertex = mat4_mul_vec4(rotation_matrix_x, transformed_vertex);
-			transformed_vertex = mat4_mul_vec4(rotation_matrix_y, transformed_vertex);
-			transformed_vertex = mat4_mul_vec4(rotation_matrix_z, transformed_vertex);
+			mat4_t rotation_matrix = mat4_identity();
+			rotation_matrix = mat4_mul_mat4(rotation_matrix_z, rotation_matrix);
+			rotation_matrix = mat4_mul_mat4(rotation_matrix_y, rotation_matrix);
+			rotation_matrix = mat4_mul_mat4(rotation_matrix_x, rotation_matrix);
+			world_matrix = mat4_mul_mat4(rotation_matrix, world_matrix);
 			// Use matrix to translate
-			transformed_vertex = mat4_mul_vec4(translation_matrix, transformed_vertex);
+			world_matrix = mat4_mul_mat4(translation_matrix, world_matrix);
+			
+			transformed_vertex = mat4_mul_vec4(world_matrix, transformed_vertex);
 
 			// Save transformed vertex in the array of transformed vertices
 			transformed_vertices[j] = transformed_vertex;
