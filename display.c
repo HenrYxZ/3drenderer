@@ -17,11 +17,11 @@ bool initialize_window(void) {
 	}
 
 	// Use SDL to query what is the fullscreen max. width and height
-	SDL_DisplayMode display_mode;
-	SDL_GetCurrentDisplayMode(0, &display_mode);
+	// SDL_DisplayMode display_mode;
+	// SDL_GetCurrentDisplayMode(0, &display_mode);
 
-	window_width = display_mode.w;
-	window_height = display_mode.h;
+	// window_width = display_mode.w;
+	// window_height = display_mode.h;
 
 	// Create a SDL window
 	window = SDL_CreateWindow(
@@ -30,7 +30,8 @@ bool initialize_window(void) {
 		SDL_WINDOWPOS_CENTERED,
 		window_width,
 		window_height,
-		SDL_WINDOW_BORDERLESS
+		SDL_WINDOW_VULKAN
+		//SDL_WINDOW_BORDERLESS
 	);
 	if (!window) {
 		fprintf(stderr, "Error creating SDL window.\n");
@@ -79,7 +80,7 @@ void draw_grid(void) {
 
 
 void draw_pixel(int x, int y, uint32_t color) {
-	if (x < window_width && y < window_height)
+	if (0 < x && x < window_width && 0 < y && y < window_height)
 		color_buffer[(window_width * y) + x] = color;
 }
 
