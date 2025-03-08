@@ -1,7 +1,7 @@
 #include "display.h"
 
-int window_width = 800;
-int window_height = 600;
+int window_width = 640;
+int window_height = 480;
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 
