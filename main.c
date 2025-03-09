@@ -15,7 +15,7 @@ triangle_t* triangles_to_render = NULL;
 float fov_factor = 640;
 
 vec3_t camera_position = { .x = 0, .y = 0, .z = -5 };
-directional_light_t light = { .direction = { .x =  -2, .y = 3, .z = 0 } };
+directional_light_t light = { .direction = { .x =  2, .y = -4, .z = 1 } };
 mat4_t proj_matrix;
 
 
@@ -181,6 +181,9 @@ void update(void) {
 			// Scale and translate the projected points to the middle of the screen
 			projected_points[j].x *= (window_width / 2.0);
 			projected_points[j].y *= (window_height / 2.0);
+
+			// Invert y axis to use screen coordinates
+			projected_points[j].y *= -1;
 
 			projected_points[j].x += (window_width / 2.0);
 			projected_points[j].y += (window_height / 2.0);
