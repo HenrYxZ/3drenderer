@@ -148,6 +148,7 @@
     <ClCompile Include="swap.c" />
     <ClCompile Include="texture.c" />
     <ClCompile Include="triangle.c" />
+    <ClCompile Include="upng.c" />
     <ClCompile Include="vector.c" />
   </ItemGroup>
   <ItemGroup>
@@ -159,12 +160,16 @@
     <ClInclude Include="swap.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="triangle.h" />
+    <ClInclude Include="upng.h" />
     <ClInclude Include="vector.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\f22.obj">
       <FileType>Document</FileType>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\cube.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

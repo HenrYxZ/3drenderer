@@ -40,6 +40,10 @@ void draw_texel(
 	vec2_t proj_a = vec2_from_vec4(a);
 	vec2_t proj_b = vec2_from_vec4(b);
 	vec2_t proj_c = vec2_from_vec4(c);
+	if (
+		(proj_a.x == proj_b.x && proj_b.x == proj_c.x) ||
+		(proj_a.y == proj_b.y && proj_b.y == proj_c.y)
+		) return;
 	vec3_t weights = barycentric_weights(proj_a, proj_b, proj_c, p);
 	float alpha = weights.x;
 	float beta = weights.y;
