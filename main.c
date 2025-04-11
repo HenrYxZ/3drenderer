@@ -49,7 +49,8 @@ void setup(void) {
 	load_png_texture_data("./assets/cube.png");
 
 	//load_obj_file("./assets/f22.obj");
-	load_cube_mesh_data();
+	load_obj_file("./assets/cube.obj");
+	//load_cube_mesh_data();
 }
 
 void handle_input(void) {
@@ -125,9 +126,9 @@ void update(void) {
 		face_t mesh_face = mesh.faces[i];
 
 		vec3_t face_vertices[3];
-		face_vertices[0] = mesh.vertices[mesh_face.a - 1];
-		face_vertices[1] = mesh.vertices[mesh_face.b - 1];
-		face_vertices[2] = mesh.vertices[mesh_face.c - 1];
+		face_vertices[0] = mesh.vertices[mesh_face.a];
+		face_vertices[1] = mesh.vertices[mesh_face.b];
+		face_vertices[2] = mesh.vertices[mesh_face.c];
 
 		vec4_t transformed_vertices[3];
 
