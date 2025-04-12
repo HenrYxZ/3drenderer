@@ -12,7 +12,10 @@
 #include "texture.h"
 #include "triangle.h"
 
-triangle_t* triangles_to_render = NULL;
+#define MAX_TRIANGLES_PER_MESH 10000
+
+triangle_t triangles_to_render[MAX_TRIANGLES_PER_MESH];
+int num_triangles_to_render = 0;
 
 float fov_factor = 640;
 
@@ -47,12 +50,12 @@ void setup(void) {
 	float zfar = 100.0;
 	proj_matrix = mat4_make_perspective(fov, aspect, znear, zfar);
 
-	load_obj_file("./assets/f22.obj");
+	load_obj_file("./assets/crab.obj");
 	//load_obj_file("./assets/cube.obj");
 
 	// Load texture data
 	//load_png_texture_data("./assets/cube.png");
-	load_png_texture_data("./assets/f22.png");
+	load_png_texture_data("./assets/crab.png");
 	
 }
 
@@ -100,8 +103,8 @@ void update(void) {
 
 	previous_frame_time = SDL_GetTicks();
 
-	// Initialize the array of projected triangles
-	triangles_to_render = NULL;
+	// initialize counter of triangles to render
+	num_triangles_to_render = 0;
 
 	//mesh.rotation.x += 0.005;
 	mesh.rotation.y += 0.005;
@@ -225,8 +228,14 @@ void update(void) {
 			.color = triangle_color
 		};
 
-		// Save the projected triangle in the array of triangles to render
-		array_push(triangles_to_render, projected_triangle);
+		if (num_triangles_to_render < MAX_TRIANGLES_PER_MESH) {
+			// Save the projected triangle in the array of triangles to render
+			triangles_to_render[num_triangles_to_render] = projected_triangle;
+			num_triangles_to_render++;
+		}
+		else {
+			break;
+		}
 	}	// end of for loop all triangle faces of our mesh
 }
 
@@ -235,8 +244,7 @@ void render(void) {
 	
 	draw_grid();
 
-	int num_triangles = array_length(triangles_to_render);
-	for (int i = 0; i < num_triangles; i++) {
+	for (int i = 0; i < num_triangles_to_render; i++) {
 		triangle_t triangle = triangles_to_render[i];
 
 		if (render_method == RENDER_FILL_TRIANGLE || render_method == RENDER_FILL_TRIANGLE_WIRE) {
@@ -305,9 +313,6 @@ void render(void) {
 			draw_rect(triangle.points[2].x, triangle.points[2].y - size / 2, size, size, 0xFFFF0000);
 		}
 	}
-
-	// Clear the array of triangles to render every frame loop
-	array_free(triangles_to_render);
 
 	render_color_buffer();
 	clear_color_buffer(0xFF000000);
