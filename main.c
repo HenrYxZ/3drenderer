@@ -26,10 +26,12 @@ int previous_frame_time = 0;
 
 void setup(void) {
 	render_method = RENDER_FILL_TRIANGLE;
-	cull_method = CULL_BACKFACE;
+	cull_method = CULL_NONE;
 
+	int num_pixels = window_width * window_height;
+	color_buffer = (uint32_t*)malloc(sizeof(uint32_t) * num_pixels);
+	z_buffer = (float*)malloc(sizeof(float) * num_pixels);
 
-	color_buffer = (uint32_t*) malloc(sizeof(uint32_t) * window_width * window_height);
 	color_buffer_texture = SDL_CreateTexture(
 		renderer,
 		SDL_PIXELFORMAT_RGBA32,
@@ -326,6 +328,7 @@ void render(void) {
 
 	render_color_buffer();
 	clear_color_buffer(0xFF000000);
+	clear_z_buffer();
 
 	SDL_RenderPresent(renderer);
 }
@@ -335,6 +338,7 @@ void free_resources(void) {
 	array_free(mesh.vertices);
 	upng_free(png_texture);
 	free(color_buffer);
+	free(z_buffer);
 }
 
 

@@ -7,6 +7,7 @@ SDL_Renderer* renderer = NULL;
 
 // Declare a pointer to an array of uint32 elements
 uint32_t* color_buffer = NULL;
+float* z_buffer = NULL;
 SDL_Texture* color_buffer_texture = NULL;
 
 
@@ -135,6 +136,15 @@ void clear_color_buffer(uint32_t color) {
 	for (int j = 0; j < window_height; j++) {
 		for (int i = 0; i < window_width; i++) {
 			color_buffer[(window_width * j) + i] = color;
+		}
+	}
+}
+
+void clear_z_buffer(void)
+{
+	for (int j = 0; j < window_height; j++) {
+		for (int i = 0; i < window_width; i++) {
+			z_buffer[(window_width * j) + i] = 1.0;
 		}
 	}
 }

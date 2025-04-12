@@ -65,11 +65,19 @@ void draw_texel(
 	int tex_x = abs((int)(interpolated_u * texture_width)) % texture_width;
 	int tex_y = abs((int)(interpolated_v * texture_height)) % texture_height;
 
-	int index = tex_x + (tex_y * texture_width);
+	int tex_idx = tex_x + (tex_y * texture_width);
 	//if (index < 0 || index >= texture_height * texture_width) {
 	//	sprintf("ERROR: index %d out of texture bounds", index);
 	//}
-	draw_pixel(x, y, texture[index]);
+	int idx = x + (window_width * y);
+	// HACK: using 1 - 1 / w so that less "depth" means closer to camera
+	float depth = 1 - interpolated_reciprocal_w;
+	if (depth <= z_buffer[idx]) {
+		draw_pixel(x, y, texture[tex_idx]);
+	}
+
+	// update z-buffer
+	z_buffer[idx] = depth;
 }
 
 void draw_filled_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color)
