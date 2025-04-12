@@ -72,12 +72,13 @@ void draw_texel(
 	int idx = x + (window_width * y);
 	// HACK: using 1 - 1 / w so that less "depth" means closer to camera
 	float depth = 1 - interpolated_reciprocal_w;
-	if (depth <= z_buffer[idx]) {
+	if (depth < z_buffer[idx]) {
 		draw_pixel(x, y, texture[tex_idx]);
+		// update z-buffer
+		z_buffer[idx] = depth;
 	}
 
-	// update z-buffer
-	z_buffer[idx] = depth;
+	
 }
 
 void draw_filled_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color)
