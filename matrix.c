@@ -3,6 +3,7 @@
 #include "matrix.h"
 #include "vector.h"
 
+
 mat4_t mat4_identity(void) {
 	mat4_t m = {{
 		{1, 0, 0, 0},
@@ -65,6 +66,7 @@ mat4_t mat4_make_rotation_z(float angle)
 	m.m[1][1] = c;
 	return m;
 }
+
 mat4_t mat4_make_perspective(float fov, float aspect, float znear, float zfar)
 {
 	mat4_t m = { { { 0 } } };
@@ -78,6 +80,7 @@ mat4_t mat4_make_perspective(float fov, float aspect, float znear, float zfar)
 
 	return m;
 }
+
 vec4_t mat4_mul_vec4(mat4_t m, vec4_t v)
 {
 	vec4_t result;
@@ -88,6 +91,7 @@ vec4_t mat4_mul_vec4(mat4_t m, vec4_t v)
 
 	return result;
 }
+
 vec4_t mat4_mul_vec4_project(mat4_t m, vec4_t v)
 {
 	vec4_t result = mat4_mul_vec4(m, v);
@@ -99,6 +103,7 @@ vec4_t mat4_mul_vec4_project(mat4_t m, vec4_t v)
 	}
 	return result;
 }
+
 mat4_t mat4_mul_mat4(mat4_t a, mat4_t b)
 {
 	mat4_t m;
@@ -109,9 +114,29 @@ mat4_t mat4_mul_mat4(mat4_t a, mat4_t b)
 				a.m[i][1] * b.m[1][j] +
 				a.m[i][2] * b.m[2][j] +
 				a.m[i][3] * b.m[3][j]
-			);
+				);
 		}
 	}
 	return m;
 }
-;
+
+mat4_t mat4_look_at(vec3_t eye, vec3_t target, vec3_t up) {
+	// Compute the forward (z), right (x), and up (y) vectors
+	vec3_t z = vec3_sub(target, eye);
+	vec3_normalize(&z);
+	vec3_t x = vec3_cross(up, z);
+	vec3_normalize(&x);
+	vec3_t y = vec3_cross(z, x);
+
+	// | x.x   x.y   x.z  -dot(x,eye) |
+	// | y.x   y.y   y.z  -dot(y,eye) |
+	// | z.x   z.y   z.z  -dot(z,eye) |
+	// |   0     0     0            1 |
+	mat4_t view_matrix = { {
+			{ x.x, x.y, x.z, -vec3_dot(x, eye) },
+			{ y.x, y.y, y.z, -vec3_dot(y, eye) },
+			{ z.x, z.y, z.z, -vec3_dot(z, eye) },
+			{   0,   0,   0,                 1 }
+	} };
+	return view_matrix;
+}

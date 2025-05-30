@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include "upng.h"
 #include "array.h"
+#include "camera.h"
 #include "display.h"
 #include "light.h"
 #include "matrix.h"
@@ -19,8 +20,9 @@ int num_triangles_to_render = 0;
 
 float fov_factor = 640;
 
-vec3_t camera_position = { .x = 0, .y = 0, .z = -5 };
 directional_light_t light = { .direction = { .x =  2, .y = -4, .z = 1 } };
+
+mat4_t view_matrix;
 mat4_t proj_matrix;
 
 
@@ -107,7 +109,7 @@ void update(void) {
 	num_triangles_to_render = 0;
 
 	//mesh.rotation.x += 0.005;
-	mesh.rotation.y += 0.005;
+	// mesh.rotation.y += 0.005;
 	// mesh.rotation.z += 0.01;
 
 	// mesh.scale.x += 0.002;
@@ -116,6 +118,14 @@ void update(void) {
 	// mesh.translation.y += 0.01;
 	// Translate the vertices away from the camera
 	mesh.translation.z = 5.0;
+
+	camera.position.x += 0.04;
+	camera.position.y += 0.04;
+
+	// Create the view matrix looking at target point
+	vec3_t target = { 0, 0, 5 };
+	vec3_t up_direction = { 0, 1, 0 };
+	view_matrix = mat4_look_at(camera.position, target, up_direction);
 
 	// Create a scale matrix that will be used to multiply the mesh vertices
 	mat4_t scale_matrix = mat4_make_scale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
@@ -155,6 +165,7 @@ void update(void) {
 			world_matrix = mat4_mul_mat4(translation_matrix, world_matrix);
 			
 			transformed_vertex = mat4_mul_vec4(world_matrix, transformed_vertex);
+			transformed_vertex = mat4_mul_vec4(view_matrix, transformed_vertex);
 
 			// Save transformed vertex in the array of transformed vertices
 			transformed_vertices[j] = transformed_vertex;
@@ -176,7 +187,8 @@ void update(void) {
 		vec3_normalize(&normal);
 
 		// Find the vector between vertex A in the triangle and the camera origin
-		vec3_t camera_ray = vec3_sub(camera_position, vector_a);
+		vec3_t origin = { 0, 0, 0 };
+		vec3_t camera_ray = vec3_sub(origin, vector_a);
 
 		// Calculate how aligned the camera ray is with the face normal (using dot product)
 		float dot_normal_camera = vec3_dot(normal, camera_ray);

@@ -7,6 +7,7 @@ typedef struct {
 	float m[4][4];
 } mat4_t;
 
+mat4_t mat4_look_at(vec3_t position, vec3_t target, vec3_t up);
 mat4_t mat4_identity(void);
 mat4_t mat4_make_scale(float sx, float sy, float sz);
 mat4_t mat4_make_translation(float tx, float ty, float tz);
