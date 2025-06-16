@@ -8,6 +8,8 @@ void draw_triangle_pixel(
 	int x, int y, uint32_t* color,
 	vec4_t a, vec4_t b, vec4_t c
 ) {
+	if (0 > x || x >= window_width || 0 > y || y >= window_height)
+		return;
 	vec2_t p = { x, y };
 	vec2_t proj_a = vec2_from_vec4(a);
 	vec2_t proj_b = vec2_from_vec4(b);
