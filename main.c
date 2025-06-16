@@ -27,6 +27,7 @@ mat4_t proj_matrix;
 
 
 bool is_running = false;
+float delta_time = 0;
 int previous_frame_time = 0;
 
 void setup(void) {
@@ -88,6 +89,22 @@ void handle_input(void) {
 				cull_method = CULL_BACKFACE;
 			if (event.key.keysym.sym == SDLK_d)
 				cull_method = CULL_NONE;
+			if (event.key.keysym.sym == SDLK_UP)
+				camera.position.y += 3.0 * delta_time;
+			if (event.key.keysym.sym == SDLK_DOWN)
+				camera.position.y -= 3.0 * delta_time;
+			if (event.key.keysym.sym == SDLK_a)
+				camera.yaw -= 1.0 * delta_time;
+			if (event.key.keysym.sym == SDLK_d)
+				camera.yaw += 1.0 * delta_time;
+			if (event.key.keysym.sym == SDLK_w) {
+				camera.forward_velocity = vec3_mul(camera.direction, 5.0 * delta_time);
+				camera.position = vec3_add(camera.position, camera.forward_velocity);
+			}
+			if (event.key.keysym.sym == SDLK_s) {
+				camera.forward_velocity = vec3_mul(camera.direction, 5.0 * delta_time);
+				camera.position = vec3_sub(camera.position, camera.forward_velocity);
+			}
 			break;
 		default:
 			break;
@@ -96,7 +113,8 @@ void handle_input(void) {
 
 void update(void) {
 
-	int delta_time = SDL_GetTicks() - previous_frame_time;
+	// Get delta time in seconds
+	delta_time = (SDL_GetTicks() - previous_frame_time) / 1000.0;
 	int time_to_wait = FRAME_TARGET_TIME - delta_time;
 
 	if (time_to_wait > 0 && time_to_wait <= FRAME_TARGET_TIME) {
@@ -119,12 +137,16 @@ void update(void) {
 	// Translate the vertices away from the camera
 	mesh.translation.z = 5.0;
 
-	camera.position.x += 0.04;
-	camera.position.y += 0.04;
-
-	// Create the view matrix looking at target point
-	vec3_t target = { 0, 0, 5 };
+	// Create the view matrix
+	vec3_t target = { 0, 0, 1 };
+	mat4_t camera_yaw_rotation = mat4_make_rotation_y(camera.yaw);
+	camera.direction = vec3_from_vec4(
+			mat4_mul_vec4(camera_yaw_rotation, vec4_from_vec3(target))
+	);
+	target = vec3_add(camera.position, camera.direction);
+	
 	vec3_t up_direction = { 0, 1, 0 };
+	
 	view_matrix = mat4_look_at(camera.position, target, up_direction);
 
 	// Create a scale matrix that will be used to multiply the mesh vertices
