@@ -155,6 +155,7 @@
   <ItemGroup>
     <ClInclude Include="array.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="clipping.h" />
     <ClInclude Include="display.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="matrix.h" />
