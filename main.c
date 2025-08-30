@@ -5,6 +5,7 @@
 #include "upng.h"
 #include "array.h"
 #include "camera.h"
+#include "clipping.h"
 #include "display.h"
 #include "light.h"
 #include "matrix.h"
@@ -12,6 +13,7 @@
 #include "vector.h"
 #include "texture.h"
 #include "triangle.h"
+
 
 #define MAX_TRIANGLES_PER_MESH 10000
 
@@ -53,12 +55,15 @@ void setup(void) {
 	float zfar = 100.0;
 	proj_matrix = mat4_make_perspective(fov, aspect, znear, zfar);
 
-	load_obj_file("./assets/crab.obj");
-	//load_obj_file("./assets/cube.obj");
+	// Initialize frustum planes with a point and a normal
+	init_frustrum_planes(fov, znear, zfar);
+
+	//load_obj_file("./assets/crab.obj");
+	load_obj_file("./assets/cube.obj");
 
 	// Load texture data
-	//load_png_texture_data("./assets/cube.png");
-	load_png_texture_data("./assets/crab.png");
+	load_png_texture_data("./assets/cube.png");
+	//load_png_texture_data("./assets/crab.png");
 	
 }
 
@@ -221,6 +226,18 @@ void update(void) {
 				continue;
 			}
 		}
+
+		// TODO: CLIPPING!!!
+
+		polygon_t polygon = create_polygon_from_triangle(
+			vec3_from_vec4(transformed_vertices[0]),
+			vec3_from_vec4(transformed_vertices[1]),
+			vec3_from_vec4(transformed_vertices[2])
+		);
+
+		clip_polygon(&polygon);
+
+		// TODO: after clipping we need to break the polygon into triangles
 
 		// Loop all three vertices to perform projection
 		vec4_t projected_points[3];
