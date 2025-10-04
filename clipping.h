@@ -4,12 +4,12 @@
 #define MAX_NUM_POLY_VERTICES 10
 
 enum {
-	LEFT_FRUSTRUM_PLANE,
-	RIGHT_FRUSTRUM_PLANE,
-	TOP_FRUSTRUM_PLANE,
-	BOTTOM_FRUSTRUM_PLANE,
-	NEAR_FRUSTRUM_PLANE,
-	FAR_FRUSTRUM_PLANE
+  LEFT_FRUSTUM_PLANE,
+  RIGHT_FRUSTUM_PLANE,
+  TOP_FRUSTUM_PLANE,
+  BOTTOM_FRUSTUM_PLANE,
+  NEAR_FRUSTUM_PLANE,
+  FAR_FRUSTUM_PLANE
 };
 
 typedef struct {
@@ -22,7 +22,7 @@ typedef struct {
 	int num_vertices;
 } polygon_t;
 
-void init_frustrum_planes(float fov, float z_near, float z_far);
+void init_frustum_planes(float fov, float z_near, float z_far);
 polygon_t create_polygon_from_triangle(vec3_t v0, vec3_t v1, vec3_t v2);
 void clip_polygon(polygon_t* polygon);
 void clip_polygon_against_plane(polygon_t* polygon, int plane);

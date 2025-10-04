@@ -56,7 +56,7 @@ void setup(void) {
 	proj_matrix = mat4_make_perspective(fov, aspect, znear, zfar);
 
 	// Initialize frustum planes with a point and a normal
-	init_frustrum_planes(fov, znear, zfar);
+	init_frustum_planes(fov, znear, zfar);
 
 	//load_obj_file("./assets/crab.obj");
 	load_obj_file("./assets/cube.obj");
@@ -227,8 +227,6 @@ void update(void) {
 			}
 		}
 
-		// TODO: CLIPPING!!!
-
 		polygon_t polygon = create_polygon_from_triangle(
 			vec3_from_vec4(transformed_vertices[0]),
 			vec3_from_vec4(transformed_vertices[1]),
@@ -236,6 +234,10 @@ void update(void) {
 		);
 
 		clip_polygon(&polygon);
+
+		//REMOVE THIS --------------------------------------------------
+		printf("number of polygon vertices: %d\n", polygon.num_vertices);
+		//--------------------------------------------------------------
 
 		// TODO: after clipping we need to break the polygon into triangles
 
