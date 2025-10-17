@@ -235,59 +235,67 @@ void update(void) {
 
 		clip_polygon(&polygon);
 
-		//REMOVE THIS --------------------------------------------------
-		printf("number of polygon vertices: %d\n", polygon.num_vertices);
-		//--------------------------------------------------------------
+		triangle_t triangles_after_clipping[MAX_NUM_POLY_TRIANGLES];
+		int num_triangles_after_clipping = 0;
 
-		// TODO: after clipping we need to break the polygon into triangles
+		triangles_from_polygon(
+			&polygon, triangles_after_clipping, &num_triangles_after_clipping
+		);
 
-		// Loop all three vertices to perform projection
-		vec4_t projected_points[3];
-		for (int j = 0; j < 3; j++) {
-			// Project the current vertex
-			projected_points[j] = mat4_mul_vec4_project(proj_matrix, transformed_vertices[j]);
+		// Loop all of the assembled triangles after clipping
+		for (int t = 0; t < num_triangles_after_clipping; t++) {
 
-			// Scale and translate the projected points to the middle of the screen
-			projected_points[j].x *= (window_width / 2.0);
-			projected_points[j].y *= (window_height / 2.0);
+			triangle_t triangle_after_clipping = triangles_after_clipping[t];
 
-			// Invert y axis to use screen coordinates
-			projected_points[j].y *= -1;
+			//REMOVE THIS --------------------------------------------------
+			printf("number of polygon vertices: %d\n", polygon.num_vertices);
+			//--------------------------------------------------------------
 
-			projected_points[j].x += (window_width / 2.0);
-			projected_points[j].y += (window_height / 2.0);
-		}
+			// Loop all three vertices to perform projection
+			vec4_t projected_points[3];
+			for (int j = 0; j < 3; j++) {
+				// Project the current vertex
+				projected_points[j] = mat4_mul_vec4_project(proj_matrix, triangle_after_clipping.points[j]);
 
-		// Calculate color from flat shading
-		vec3_t l = {
-			.x = -light.direction.x, .y = -light.direction.y,  .z = -light.direction.z
-		};
-		vec3_normalize(&l);
-		float lambert_factor = vec3_dot(l, normal);
-		lambert_factor = lambert_factor > 0.0 ? lambert_factor : 0.0;
-		uint32_t triangle_color = light_apply_intensity(mesh_face.color, lambert_factor);
+				// Scale and translate the projected points to the middle of the screen
+				projected_points[j].x *= (window_width / 2.0);
+				projected_points[j].y *= (window_height / 2.0);
 
-		triangle_t projected_triangle = {
-			.points = {
-				{ projected_points[0].x, projected_points[0].y, projected_points[0].z, projected_points[0].w },
-				{ projected_points[1].x, projected_points[1].y, projected_points[1].z, projected_points[1].w },
-				{ projected_points[2].x, projected_points[2].y, projected_points[2].z, projected_points[2].w }
-			},
-			.texcoords = {
-				{mesh_face.a_uv.u, mesh_face.a_uv.v},
-				{mesh_face.b_uv.u, mesh_face.b_uv.v},
-				{mesh_face.c_uv.u, mesh_face.c_uv.v},
+				// Invert y axis to use screen coordinates
+				projected_points[j].y *= -1;
+
+				projected_points[j].x += (window_width / 2.0);
+				projected_points[j].y += (window_height / 2.0);
+			}
+
+			// Calculate color from flat shading
+			vec3_t l = {
+				.x = -light.direction.x, .y = -light.direction.y,  .z = -light.direction.z
+			};
+			vec3_normalize(&l);
+			float lambert_factor = vec3_dot(l, normal);
+			lambert_factor = lambert_factor > 0.0 ? lambert_factor : 0.0;
+			uint32_t triangle_color = light_apply_intensity(mesh_face.color, lambert_factor);
+
+			triangle_t triangle_to_render = {
+				.points = {
+					{ projected_points[0].x, projected_points[0].y, projected_points[0].z, projected_points[0].w },
+					{ projected_points[1].x, projected_points[1].y, projected_points[1].z, projected_points[1].w },
+					{ projected_points[2].x, projected_points[2].y, projected_points[2].z, projected_points[2].w }
 				},
-			.color = triangle_color
-		};
+				.texcoords = {
+					{mesh_face.a_uv.u, mesh_face.a_uv.v},
+					{mesh_face.b_uv.u, mesh_face.b_uv.v},
+					{mesh_face.c_uv.u, mesh_face.c_uv.v},
+					},
+				.color = triangle_color
+			};
 
-		if (num_triangles_to_render < MAX_TRIANGLES_PER_MESH) {
-			// Save the projected triangle in the array of triangles to render
-			triangles_to_render[num_triangles_to_render] = projected_triangle;
-			num_triangles_to_render++;
-		}
-		else {
-			break;
+			if (num_triangles_to_render < MAX_TRIANGLES_PER_MESH) {
+				// Save the projected triangle in the array of triangles to render
+				triangles_to_render[num_triangles_to_render] = triangle_to_render;
+				num_triangles_to_render++;
+			}
 		}
 	}	// end of for loop all triangle faces of our mesh
 }
