@@ -28,19 +28,23 @@ bool initialize_window(void) {
 	}
 
 	// Use SDL to query what is the fullscreen max. width and height
-	// SDL_DisplayMode display_mode;
-	// SDL_GetCurrentDisplayMode(0, &display_mode);
+	SDL_DisplayMode display_mode;
+	SDL_GetCurrentDisplayMode(0, &display_mode);
 
-	// window_width = display_mode.w;
-	// window_height = display_mode.h;
+	int fullscreen_width = display_mode.w;
+	int fullscreen_height = display_mode.h;
+	int pixel_size = 4;
+
+	window_width = fullscreen_width / pixel_size;
+	window_height = fullscreen_height / pixel_size;
 
 	// Create a SDL window
 	window = SDL_CreateWindow(
 		NULL,
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		window_width,
-		window_height,
+		fullscreen_width,
+		fullscreen_height,
 		SDL_WINDOW_VULKAN
 		//SDL_WINDOW_BORDERLESS
 	);
