@@ -8,8 +8,6 @@ void draw_triangle_pixel(
 	int x, int y, uint32_t* color,
 	vec4_t a, vec4_t b, vec4_t c
 ) {
-	if (0 > x || x >= window_width || 0 > y || y >= window_height)
-		return;
 	vec2_t p = { x, y };
 	vec2_t proj_a = vec2_from_vec4(a);
 	vec2_t proj_b = vec2_from_vec4(b);
@@ -26,13 +24,12 @@ void draw_triangle_pixel(
 	// To have perspective correct uv interpolation we use 1 / w
 	float interpolated_reciprocal_w = alpha / a.w + beta / b.w + gamma / c.w;
 
-	int idx = x + (window_width * y);
 	// HACK: using 1 - 1 / w so that less "depth" means closer to camera
 	float depth = 1.0 - interpolated_reciprocal_w;
-	if (depth < z_buffer[idx]) {
+	if (depth < get_zbuffer_at(x, y)) {
 		draw_pixel(x, y, color);
 		// update z-buffer
-		z_buffer[idx] = depth;
+		update_zbuffer_at(x, y, depth);
 	}
 }
 
@@ -74,13 +71,12 @@ void draw_texel(
 	//if (index < 0 || index >= texture_height * texture_width) {
 	//	sprintf("ERROR: index %d out of texture bounds", index);
 	//}
-	int idx = x + (window_width * y);
 	// HACK: using 1 - 1 / w so that less "depth" means closer to camera
 	float depth = 1.0 - interpolated_reciprocal_w;
-	if (depth < z_buffer[idx]) {
+	if (depth < get_zbuffer_at(x, y)) {
 		draw_pixel(x, y, texture[tex_idx]);
 		// update z-buffer
-		z_buffer[idx] = depth;
+		update_zbuffer_at(x, y, depth);
 	}
 }
 
