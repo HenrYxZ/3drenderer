@@ -1,3 +1,4 @@
+#include "matrix.h"
 #include "camera.h"
 
 static camera_t camera = {
@@ -41,6 +42,11 @@ void add_camera_yaw(float value)
 	camera.yaw += value;
 }
 
+void add_camera_pitch(float value)
+{
+	camera.pitch += value;
+}
+
 void set_camera_forward_velocity(vec3_t forward_velocity)
 {
 	camera.forward_velocity = forward_velocity;
@@ -50,3 +56,18 @@ void update_camera_position(void)
 {
 	camera.position = vec3_add(camera.position, camera.forward_velocity);
 }
+
+vec3_t get_camera_target(void)
+{
+	vec3_t target = { 0, 0, 1 };
+	mat4_t camera_yaw_rotation = mat4_make_rotation_y(camera.yaw);
+	mat4_t camera_pitch_rotation = mat4_make_rotation_x(camera.pitch);
+	mat4_t rotation = mat4_mul_mat4(camera_yaw_rotation, camera_pitch_rotation);
+	camera.direction = vec3_from_vec4(
+		mat4_mul_vec4(rotation, vec4_from_vec3(target))
+	);
+	target = vec3_add(get_camera_position(), camera.direction);
+	return target;
+}
+
+

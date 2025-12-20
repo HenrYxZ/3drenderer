@@ -117,32 +117,32 @@ void handle_input(void) {
 			}
 			if (event.key.keysym.sym == SDLK_UP)
 			{
-				add_camera_position_y(3.0 * delta_time);
+				set_camera_forward_velocity(vec3_mul(get_camera_direction(), 5.0 * delta_time));
+				update_camera_position();
 				break;
 			}
 			if (event.key.keysym.sym == SDLK_DOWN)
 			{
-				add_camera_position_y(-3.0 * delta_time);
+				set_camera_forward_velocity(vec3_mul(get_camera_direction(), -5.0 * delta_time));
+				update_camera_position();
 				break;
 			}
-			if (event.key.keysym.sym == SDLK_a)
+			if (event.key.keysym.sym == SDLK_LEFT)
 			{
 				add_camera_yaw(-1.0 * delta_time);
 				break;
 			}
-			if (event.key.keysym.sym == SDLK_d)
+			if (event.key.keysym.sym == SDLK_RIGHT)
 			{
 				add_camera_yaw(1.0 * delta_time);
 				break;
 			}
 			if (event.key.keysym.sym == SDLK_w) {
-				set_camera_forward_velocity(vec3_mul(get_camera_direction(), 5.0 * delta_time));
-				update_camera_position();
+				add_camera_pitch(3.0 * delta_time);
 				break;
 			}
 			if (event.key.keysym.sym == SDLK_s) {
-				set_camera_forward_velocity(vec3_mul(get_camera_direction(), -5.0 * delta_time));
-				update_camera_position();
+				add_camera_pitch(-3.0 * delta_time);
 				break;
 			}
 			break;
@@ -179,15 +179,7 @@ void update(void) {
 	mesh.translation.z = 5.0;
 
 	// Create the view matrix
-	vec3_t target = { 0, 0, 1 };
-	mat4_t camera_yaw_rotation = mat4_make_rotation_y(get_camera_yaw());
-	mat4_t camera_pitch_rotation = mat4_make_rotation_x(get_camera_pitch());
-	mat4_t rotation = mat4_mul_mat4(camera_yaw_rotation, camera_pitch_rotation);
-	vec3_t direction = vec3_from_vec4(
-			mat4_mul_vec4(rotation, vec4_from_vec3(target))
-	);
-	target = vec3_add(get_camera_position(), direction);
-	
+	vec3_t target = get_camera_target();
 	vec3_t up_direction = { 0, 1, 0 };
 	
 	view_matrix = mat4_look_at(get_camera_position(), target, up_direction);

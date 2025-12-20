@@ -17,5 +17,7 @@ float get_camera_yaw(void);
 float get_camera_pitch(void);
 void add_camera_position_y(float value);
 void add_camera_yaw(float value);
+void add_camera_pitch(float value);
 void set_camera_forward_velocity(vec3_t forward_velocity);
 void update_camera_position(void);
+vec3_t get_camera_target(void);
