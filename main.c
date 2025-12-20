@@ -22,8 +22,6 @@ int num_triangles_to_render = 0;
 
 float fov_factor = 640;
 
-directional_light_t light = { .direction = { .x =  2, .y = -4, .z = 1 } };
-
 mat4_t view_matrix;
 mat4_t proj_matrix;
 
@@ -35,6 +33,9 @@ int previous_frame_time = 0;
 void setup(void) {
 	set_render_method(RENDER_FILL_TRIANGLE);
 	set_cull_method(CULL_NONE);
+
+	// Initialize the scene light direction
+	init_light(vec3_new(0, 0, 1));
 
 	// Initialize projection matrix
 	int window_width = get_window_width();
@@ -52,12 +53,12 @@ void setup(void) {
 	// Initialize frustum planes with a point and a normal
 	init_frustum_planes(fovx, fovy, znear, zfar);
 
-	//load_obj_file("./assets/crab.obj");
-	load_obj_file("./assets/cube.obj");
+	load_obj_file("./assets/crab.obj");
+	//load_obj_file("./assets/cube.obj");
 
 	// Load texture data
-	load_png_texture_data("./assets/cube.png");
-	//load_png_texture_data("./assets/crab.png");
+	//load_png_texture_data("./assets/cube.png");
+	load_png_texture_data("./assets/crab.png");
 	
 }
 
@@ -116,32 +117,32 @@ void handle_input(void) {
 			}
 			if (event.key.keysym.sym == SDLK_UP)
 			{
-				camera.position.y += 3.0 * delta_time;
+				add_camera_position_y(3.0 * delta_time);
 				break;
 			}
 			if (event.key.keysym.sym == SDLK_DOWN)
 			{
-				camera.position.y -= 3.0 * delta_time;
+				add_camera_position_y(-3.0 * delta_time);
 				break;
 			}
 			if (event.key.keysym.sym == SDLK_a)
 			{
-				camera.yaw -= 1.0 * delta_time;
+				add_camera_yaw(-1.0 * delta_time);
 				break;
 			}
 			if (event.key.keysym.sym == SDLK_d)
 			{
-				camera.yaw += 1.0 * delta_time;
+				add_camera_yaw(1.0 * delta_time);
 				break;
 			}
 			if (event.key.keysym.sym == SDLK_w) {
-				camera.forward_velocity = vec3_mul(camera.direction, 5.0 * delta_time);
-				camera.position = vec3_add(camera.position, camera.forward_velocity);
+				set_camera_forward_velocity(vec3_mul(get_camera_direction(), 5.0 * delta_time));
+				update_camera_position();
 				break;
 			}
 			if (event.key.keysym.sym == SDLK_s) {
-				camera.forward_velocity = vec3_mul(camera.direction, 5.0 * delta_time);
-				camera.position = vec3_sub(camera.position, camera.forward_velocity);
+				set_camera_forward_velocity(vec3_mul(get_camera_direction(), -5.0 * delta_time));
+				update_camera_position();
 				break;
 			}
 			break;
@@ -179,15 +180,17 @@ void update(void) {
 
 	// Create the view matrix
 	vec3_t target = { 0, 0, 1 };
-	mat4_t camera_yaw_rotation = mat4_make_rotation_y(camera.yaw);
-	camera.direction = vec3_from_vec4(
-			mat4_mul_vec4(camera_yaw_rotation, vec4_from_vec3(target))
+	mat4_t camera_yaw_rotation = mat4_make_rotation_y(get_camera_yaw());
+	mat4_t camera_pitch_rotation = mat4_make_rotation_x(get_camera_pitch());
+	mat4_t rotation = mat4_mul_mat4(camera_yaw_rotation, camera_pitch_rotation);
+	vec3_t direction = vec3_from_vec4(
+			mat4_mul_vec4(rotation, vec4_from_vec3(target))
 	);
-	target = vec3_add(camera.position, camera.direction);
+	target = vec3_add(get_camera_position(), direction);
 	
 	vec3_t up_direction = { 0, 1, 0 };
 	
-	view_matrix = mat4_look_at(camera.position, target, up_direction);
+	view_matrix = mat4_look_at(get_camera_position(), target, up_direction);
 
 	// Create a scale matrix that will be used to multiply the mesh vertices
 	mat4_t scale_matrix = mat4_make_scale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
@@ -307,12 +310,7 @@ void update(void) {
 			}
 
 			// Calculate color from flat shading
-			vec3_t l = {
-				.x = -light.direction.x, .y = -light.direction.y,  .z = -light.direction.z
-			};
-			vec3_normalize(&l);
-			float lambert_factor = vec3_dot(l, normal);
-			lambert_factor = lambert_factor > 0.0 ? lambert_factor : 0.0;
+			float lambert_factor = -vec3_dot(normal, get_light_direction());
 			uint32_t triangle_color = light_apply_intensity(mesh_face.color, lambert_factor);
 
 			triangle_t triangle_to_render = {

@@ -7,4 +7,7 @@ uint32_t light_apply_intensity(uint32_t original_color, float factor);
 
 typedef struct {
 	vec3_t direction;
-} directional_light_t;
+} light_t;
+
+void init_light(vec3_t direction);
+vec3_t get_light_direction(void);
