@@ -165,7 +165,7 @@ void update(void) {
 	for (int mesh_idx = 0; mesh_idx < get_num_meshes(); mesh_idx++) {
 		mesh_t* mesh = get_mesh_ptr(mesh_idx);
 
-		//mesh.rotation.x += 0.005;
+		// mesh.rotation.x += 0.005;
 		// mesh.rotation.y += 0.005;
 		// mesh.rotation.z += 0.01;
 
@@ -310,7 +310,8 @@ void update(void) {
 						{ triangles_after_clipping->texcoords[1].u, triangles_after_clipping->texcoords[1].v },
 						{ triangles_after_clipping->texcoords[2].u, triangles_after_clipping->texcoords[2].v },
 					},
-					.color = triangle_color
+					.color = triangle_color,
+					.texture = mesh->texture
 				};
 
 				if (num_triangles_to_render < MAX_TRIANGLES_PER_MESH) {
@@ -354,7 +355,7 @@ void render(void) {
 		}
 
 		if (should_render_textured_triangles()) {
-			/*draw_textured_triangle(
+			draw_textured_triangle(
 				triangle.points[0].x,
 				triangle.points[0].y,
 				triangle.points[0].z,
@@ -373,8 +374,8 @@ void render(void) {
 				triangle.points[2].w,
 				triangle.texcoords[2].u,
 				triangle.texcoords[2].v,
-				get_mesh_ptr()
-			);*/
+				triangle.texture
+			);
 		}
 		
 		if (should_render_wireframe()) {

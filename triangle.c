@@ -34,7 +34,7 @@ void draw_triangle_pixel(
 }
 
 void draw_texel(
-	int x, int y, uint32_t* texture,
+	int x, int y, upng_t* texture,
 	vec4_t a, vec4_t b, vec4_t c,
 	tex2_t a_uv, tex2_t b_uv, tex2_t c_uv
 ) {
@@ -56,28 +56,34 @@ void draw_texel(
 	float interpolated_reciprocal_w;
 	
 	// To have perspective correct uv interpolation we use 1 / w
-	//interpolated_u = alpha * (a_uv.u / a.w) + beta * (b_uv.u / b.w) + gamma * (c_uv.u / c.w);
-	//interpolated_v = alpha * (a_uv.v / a.w) + beta * (b_uv.v / b.w) + gamma * (c_uv.v / c.w);
-	//interpolated_reciprocal_w = alpha / a.w + beta / b.w + gamma / c.w;
+	interpolated_u = alpha * (a_uv.u / a.w) + beta * (b_uv.u / b.w) + gamma * (c_uv.u / c.w);
+	interpolated_v = alpha * (a_uv.v / a.w) + beta * (b_uv.v / b.w) + gamma * (c_uv.v / c.w);
+	interpolated_reciprocal_w = alpha / a.w + beta / b.w + gamma / c.w;
 
-	//interpolated_u /= interpolated_reciprocal_w;
-	//interpolated_v /= interpolated_reciprocal_w;
+	interpolated_u /= interpolated_reciprocal_w;
+	interpolated_v /= interpolated_reciprocal_w;
 
-	//// HACK: use modulo to not overflow texture buffer when pixels get outside the triangle
-	//int tex_x = abs((int)(interpolated_u * texture_width)) % texture_width;
-	//int tex_y = abs((int)(interpolated_v * texture_height)) % texture_height;
+	int texture_width = upng_get_width(texture);
+	int texture_height = upng_get_height(texture);
 
-	//int tex_idx = tex_x + (tex_y * texture_width);
-	////if (index < 0 || index >= texture_height * texture_width) {
-	////	sprintf("ERROR: index %d out of texture bounds", index);
-	////}
-	//// HACK: using 1 - 1 / w so that less "depth" means closer to camera
-	//float depth = 1.0 - interpolated_reciprocal_w;
-	//if (depth < get_zbuffer_at(x, y)) {
-	//	draw_pixel(x, y, texture[tex_idx]);
-	//	// update z-buffer
-	//	update_zbuffer_at(x, y, depth);
+	// hack: use modulo to not overflow texture buffer when pixels get outside the triangle
+	int tex_x = abs((int)(interpolated_u * texture_width)) % texture_width;
+	int tex_y = abs((int)(interpolated_v * texture_height)) % texture_height;
+
+	int tex_idx = tex_x + (tex_y * texture_width);
+	//if (index < 0 || index >= texture_height * texture_width) {
+	//	sprintf("error: index %d out of texture bounds", index);
 	//}
+	// hack: using 1 - 1 / w so that less "depth" means closer to camera
+	float depth = 1.0 - interpolated_reciprocal_w;
+	if (depth < get_zbuffer_at(x, y)) {
+		// Get the buffer of colors from the texture
+		uint32_t* texture_buffer = (uint32_t*)upng_get_buffer(texture);
+
+		draw_pixel(x, y, texture_buffer[tex_idx]);
+		// update z-buffer
+		update_zbuffer_at(x, y, depth);
+	}
 }
 
 void draw_filled_triangle(
@@ -163,7 +169,7 @@ void draw_textured_triangle(
 	int x0, int y0, float z0, float w0, float u0, float v0,
 	int x1, int y1, float z1, float w1, float u1, float v1,
 	int x2, int y2, float z2, float w2, float u2, float v2,
-	uint32_t* texture
+	upng_t* texture
 )
 {
 	// Sort vertices by y-coordinate ascending (y0 < y1 < y2)
