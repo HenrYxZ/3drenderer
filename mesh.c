@@ -50,17 +50,20 @@ void load_obj_file(char* filename) {
 
     // Face indices
     if (strncmp(line, "f ", 2) == 0) {
-      int vertex_indices[3];
-      int texture_indices[3];
-      int normal_indices[3];
-      sscanf_s(
+      int vertex_indices[4];
+      int texture_indices[4];
+      int normal_indices[4];
+      int count = sscanf_s(
         line,
-        "f %d/%d/%d %d/%d/%d %d/%d/%d",
+        "f %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d",
         &vertex_indices[0], &texture_indices[0], &normal_indices[0],
         &vertex_indices[1], &texture_indices[1], &normal_indices[1],
-        &vertex_indices[2], &texture_indices[2], &normal_indices[2]
+        &vertex_indices[2], &texture_indices[2], &normal_indices[2],
+        &vertex_indices[3], &texture_indices[3], &normal_indices[3]
       );
-      face_t f = {
+
+      if (count == 9) {
+        face_t f = {
         .a = vertex_indices[0] - 1,
         .b = vertex_indices[1] - 1,
         .c = vertex_indices[2] - 1,
@@ -68,8 +71,33 @@ void load_obj_file(char* filename) {
         .b_uv = tex_coords[texture_indices[1] - 1],
         .c_uv = tex_coords[texture_indices[2] - 1],
         .color = 0xFFFFFFFF
-      };
-      array_push(mesh->faces, f);
+        };
+        array_push(mesh->faces, f);
+      }
+      else {
+        face_t f1 = {
+        .a = vertex_indices[0] - 1,
+        .b = vertex_indices[1] - 1,
+        .c = vertex_indices[2] - 1,
+        .a_uv = tex_coords[texture_indices[0] - 1],
+        .b_uv = tex_coords[texture_indices[1] - 1],
+        .c_uv = tex_coords[texture_indices[2] - 1],
+        .color = 0xFFFFFFFF
+        };
+        face_t f2 = {
+        .a = vertex_indices[0] - 1,
+        .b = vertex_indices[2] - 1,
+        .c = vertex_indices[3] - 1,
+        .a_uv = tex_coords[texture_indices[0] - 1],
+        .b_uv = tex_coords[texture_indices[2] - 1],
+        .c_uv = tex_coords[texture_indices[3] - 1],
+        .color = 0xFFFFFFFF
+        };
+        array_push(mesh->faces, f1);
+        array_push(mesh->faces, f2);
+      }
+
+      
     }
   }
 
